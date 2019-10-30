@@ -19,6 +19,25 @@ JOIN products as p ON p.product_id = od.product_id;
 -- ALSO IMPORTANT: You have to do some math here. How do you get the order total? You'll have to 
 -- multiply the unit_price column by the quanity column, then SUM over each order_id
 
+SELECT 
+	SUM(p.unit_price*od.quantity) AS "total order cost"
+	,o.order_id
+
+FROM orders as o
+	JOIN order_details as od 
+		ON o.order_id = od.order_id
+	JOIN products as p 
+		ON p.product_id = od.product_id
+
+GROUP BY
+	o.order_id
+
+ORDER BY
+	o.order_id;
+
+
+
+-- ANDREW
 SELECT SUM(p.unit_price*od.quantity)
 FROM orders as o
 JOIN order_details as od ON o.order_id = od.order_id
@@ -27,6 +46,37 @@ GROUP BY o.order_id;
 
 -- 3) Use the above query as a CTE, and use AVG, stddev_samp, and COUNT, to get the mean, standard deviation
 -- of the orders, and how many orders there are total.
+
+WITH total_orders as (SELECT 
+						SUM(p.unit_price*od.quantity) AS "total order cost"
+						,o.order_id
+
+					FROM orders as o
+						JOIN order_details as od 
+							ON o.order_id = od.order_id
+						JOIN products as p 
+							ON p.product_id = od.product_id
+
+					GROUP BY
+						o.order_id
+
+					ORDER BY
+						o.order_id)
+
+SELECT
+	AVG("total order cost")
+	,STDDEV_SAMP("total order cost")
+	,COUNT("total order cost")
+
+FROM
+	total_orders;
+
+
+
+
+
+
+-- ANDREW
 WITH order_totals as (
 SELECT SUM(p.unit_price*od.quantity) as total
 FROM orders as o
